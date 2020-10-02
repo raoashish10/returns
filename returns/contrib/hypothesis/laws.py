@@ -28,6 +28,7 @@ class _Settings(NamedTuple):
 
     settings_kwargs: Dict[str, Any]
     use_init: bool
+    mark_xfail: bool
 
 
 def check_all_laws(
@@ -35,6 +36,7 @@ def check_all_laws(
     *,
     settings_kwargs: Optional[Dict[str, Any]] = None,
     use_init: bool = False,
+    mark_xfail: bool = False,
 ) -> None:
     """
     Function to check all definied mathematical laws in a specified container.
@@ -62,6 +64,7 @@ def check_all_laws(
     settings = _Settings(
         settings_kwargs if settings_kwargs is not None else {},
         use_init,
+        mark_xfail,
     )
 
     for interface, laws in container_type.laws().items():
@@ -217,6 +220,9 @@ def _create_law_test_case(
             _run_law(container_type, law, settings=settings),
         ),
     )
+
+    if settings.mark_xfail:
+        test_function = pytest.mark.xfail(test_function)
 
     called_from = inspect.stack()[2]
     module = inspect.getmodule(called_from[0])
